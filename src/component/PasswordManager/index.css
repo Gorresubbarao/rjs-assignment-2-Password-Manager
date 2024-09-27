@@ -82,6 +82,12 @@
   background: transparent;
 }
 
+.button-container{
+  display: flex;
+  align-items: center;
+  justify-content: end;
+}
+
 .add-button {
   border: none;
   border-radius: 8px;
@@ -91,7 +97,6 @@
   cursor: pointer;
   width: 120px;
   height: 36px;
-  align-self: flex-end;
 }
 
 .lock-sm-mobile-container {
@@ -173,8 +178,9 @@
 }
 
 .check-box-container {
-  align-self: flex-end;
+  
   display: flex;
+  justify-content: flex-end;
   align-items: center;
 }
 
@@ -183,4 +189,37 @@
   outline: none;
   cursor: pointer;
   margin-right: 12px;
+}
+
+.view-password-list {
+  display: flex;
+  padding-left: 0px;
+  flex-wrap: wrap;
+}
+
+.emty-list-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.emty-list-image {
+  height: 194px;
+  width: 242px;
+}
+
+@media (min-width: 768px) {
+  .emty-list-image {
+    height: 294px;
+    width: 342px;
+  }
+}
+
+.no-password-text {
+  color: #ffffff;
+  font-size: 23px;
+  font-family: 'Roboto';
 }

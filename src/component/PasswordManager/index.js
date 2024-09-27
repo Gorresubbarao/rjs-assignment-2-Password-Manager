@@ -1,6 +1,8 @@
 import {Component} from 'react'
 
 import {v4 as uuid} from 'uuid'
+
+import ViewPasswordItem from '../ViewPasswordItem'
 import './index.css'
 
 class PasswordManager extends Component {
@@ -9,6 +11,7 @@ class PasswordManager extends Component {
     username: '',
     newPassword: '',
     yourPasswordList: [],
+    isCheked: false,
   }
 
   onChangeWebsiteName = event => {
@@ -30,7 +33,7 @@ class PasswordManager extends Component {
   }
 
   onSubmitNewPassword = event => {
-    preventDefault(event)
+    event.preventDefault()
 
     const {websiteName, username, newPassword} = this.state
 
@@ -38,9 +41,7 @@ class PasswordManager extends Component {
       websiteName,
       username,
       newPassword,
-      isCheked: false,
       id: uuid(),
-      searchInput,
     }
 
     this.setState(prevState => ({
@@ -61,7 +62,7 @@ class PasswordManager extends Component {
           <div className="img-and-hr-container">
             <img
               src="https://assets.ccbp.in/frontend/react-js/password-manager-website-img.png"
-              alt="img"
+              alt="website"
               className="website-img"
             />
             <hr className="hr-element" />
@@ -78,7 +79,7 @@ class PasswordManager extends Component {
           <div className="img-and-hr-container">
             <img
               src="https://assets.ccbp.in/frontend/react-js/password-manager-username-img.png"
-              alt="img"
+              alt="username"
               className="website-img"
             />
             <hr className="hr-element" />
@@ -86,7 +87,7 @@ class PasswordManager extends Component {
           <input
             type="text"
             value={username}
-            placeholder="Enter Website"
+            placeholder="Enter Username"
             className="input-element"
             onChange={this.onChangeUsername}
           />
@@ -95,21 +96,21 @@ class PasswordManager extends Component {
           <div className="img-and-hr-container">
             <img
               src="https://assets.ccbp.in/frontend/react-js/password-manager-password-img.png"
-              alt="img"
+              alt="password"
               className="website-img"
             />
             <hr className="hr-element" />
           </div>
           <input
-            type="text"
+            type="password"
             value={newPassword}
-            placeholder="Enter Website"
+            placeholder="Enter Password"
             className="input-element"
             onChange={this.onChangeNewPassword}
           />
         </div>
-        <div>
-          <button className="add-button" type="submit">
+        <div className="button-container">
+          <button className="add-button" type="submit" data-testid="add">
             Add
           </button>
         </div>
@@ -117,27 +118,25 @@ class PasswordManager extends Component {
     )
   }
 
-  renderFormAndImgContainer = () => {
-    return (
-      <div className="form-and-img-container">
-        <div className="lock-sm-mobile-container">
-          <img
-            src="https://assets.ccbp.in/frontend/react-js/password-manager-sm-img.png"
-            alt="password manager"
-            className="lock-sm-mobile"
-          />
-        </div>
-        {this.formInputContainer()}
-        <div className="lock-lg-desk-top-container">
-          <img
-            src="https://assets.ccbp.in/frontend/react-js/password-manager-lg-img.png"
-            alt="password manager"
-            className="lock-desk-top"
-          />
-        </div>
+  renderFormAndImgContainer = () => (
+    <div className="form-and-img-container">
+      <div className="lock-sm-mobile-container">
+        <img
+          src="https://assets.ccbp.in/frontend/react-js/password-manager-sm-img.png"
+          alt="password manager"
+          className="lock-sm-mobile"
+        />
       </div>
-    )
-  }
+      {this.formInputContainer()}
+      <div className="lock-lg-desk-top-container">
+        <img
+          src="https://assets.ccbp.in/frontend/react-js/password-manager-lg-img.png"
+          alt="app logo"
+          className="lock-desk-top"
+        />
+      </div>
+    </div>
+  )
 
   onChangeSearchInput = event => {
     this.setState({
@@ -145,15 +144,73 @@ class PasswordManager extends Component {
     })
   }
 
+  onDeletePasswordItem = id => {
+    const {yourPasswordList} = this.state
+    const updatedpasswordList = yourPasswordList.filter(
+      eachItem => eachItem.id !== id,
+    )
+
+    this.setState({
+      yourPasswordList: updatedpasswordList,
+    })
+  }
+
+  toggleCheckBox = () => {
+    this.setState(prevState => ({
+      isCheked: !prevState.isCheked,
+    }))
+  }
+
+  getSearcheResult = () => {
+    const {yourPasswordList, searchInput} = this.state
+
+    const searchedPassworResults = yourPasswordList.filter(eachItem =>
+      eachItem.websiteName.includes(searchInput),
+    )
+    return searchedPassworResults
+  }
+
+  showEmtylistImage = () => (
+    <div className="emty-list-image-container">
+      <img
+        src="https://assets.ccbp.in/frontend/react-js/no-passwords-img.png"
+        alt="no passwords"
+        className="emty-list-image"
+      />
+      <p className="no-password-text">No Passwords</p>
+    </div>
+  )
+
+  showPasswordStatusView = () => {
+    const {yourPasswordList, searchInput, isCheked} = this.state
+    const searchedViewPasswordList = this.getSearcheResult()
+
+    const viewList = searchInput ? searchedViewPasswordList : yourPasswordList
+
+    if (viewList.length > 0) {
+      return viewList.map(eachItem => (
+        <ViewPasswordItem
+          key={eachItem.id}
+          passwordItemDetailes={eachItem}
+          isCheked={isCheked}
+          deletePasswordItem={this.onDeletePasswordItem}
+        />
+      ))
+    }
+
+    return this.showEmtylistImage()
+  }
+
   renderListPasswordAndSearchContainer = () => {
-    const {searchInput} = this.state
+    const {searchInput, yourPasswordList, isCheked} = this.state
+
     return (
       <div className="search-and-list-of-password-container">
         <div className="password-count-and-search-input-container">
           <div className="password-and-cout-container">
-            <h1 className="your-password-text">Your Password</h1>
+            <h1 className="your-password-text">Your Passwords</h1>
             <div className="password-count">
-              <span className="span">0</span>
+              <p className="span">{yourPasswordList.length}</p>
             </div>
           </div>
           <div className="input-and-img-container">
@@ -176,11 +233,18 @@ class PasswordManager extends Component {
         </div>
         <hr />
         <div className="check-box-container">
-          <input type="check-box" className="check-box" id="checkbox" />
-          <lable id="checkbox" className="span">
-            Show password
-          </lable>
+          <input
+            type="checkbox"
+            className="check-box"
+            id="checkbox"
+            checked={isCheked}
+            onChange={this.toggleCheckBox}
+          />
+          <label htmlFor="checkbox" className="span">
+            Show passwords
+          </label>
         </div>
+        <ul className="view-password-list">{this.showPasswordStatusView()}</ul>
       </div>
     )
   }
@@ -191,7 +255,7 @@ class PasswordManager extends Component {
         <div className="responsive-container">
           <img
             src="https://assets.ccbp.in/frontend/react-js/password-manager-logo-img.png"
-            alt="palog"
+            alt="app logo"
             className="password-logo"
           />
           {this.renderFormAndImgContainer()}
